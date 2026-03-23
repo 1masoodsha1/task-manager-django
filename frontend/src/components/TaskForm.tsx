@@ -1,138 +1,115 @@
 import { useEffect, useMemo, useState } from 'react';
 import type { Task, TaskCreateOrUpdate, TaskStatus } from '../models/task';
 
-interface TaskFormProps {
+type Props = {
   initialTask: Task | null;
-  onSubmitTask: (task: TaskCreateOrUpdate) => void;
-  onCancelEdit: () => void;
-}
+  onSubmit: (task: TaskCreateOrUpdate) => void;
+  onCancel: () => void;
+};
 
-interface FormState {
-  title: string;
-  description: string;
-  status: TaskStatus;
-  dueDate: string;
-}
-
-const statuses: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'DONE'];
-
-function toDateTimeLocalValue(value?: string | null): string {
-  if (!value) return '';
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
-export default function TaskForm({
-  initialTask,
-  onSubmitTask,
-  onCancelEdit,
-}: TaskFormProps) {
-  const [form, setForm] = useState<FormState>({
-    title: '',
-    description: '',
-    status: 'TODO',
-    dueDate: '',
-  });
+export default function TaskForm({ initialTask, onSubmit, onCancel }: Props) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState<TaskStatus>('TODO');
+  const [dueDate, setDueDate] = useState('');
 
   useEffect(() => {
     if (initialTask) {
-      setForm({
-        title: initialTask.title,
-        description: initialTask.description ?? '',
-        status: initialTask.status,
-        dueDate: toDateTimeLocalValue(initialTask.dueDate),
-      });
-      return;
+      setTitle(initialTask.title ?? '');
+      setDescription(initialTask.description ?? '');
+      setStatus(initialTask.status ?? 'TODO');
+      setDueDate(initialTask.dueDate ? initialTask.dueDate.slice(0, 16) : '');
+    } else {
+      setTitle('');
+      setDescription('');
+      setStatus('TODO');
+      setDueDate('');
     }
-
-    setForm({
-      title: '',
-      description: '',
-      status: 'TODO',
-      dueDate: '',
-    });
   }, [initialTask]);
 
   const hasPastDueDateError = useMemo(() => {
-    if (!form.dueDate || form.status === 'DONE') return false;
-    return new Date(form.dueDate).getTime() < new Date().getTime();
-  }, [form.dueDate, form.status]);
+    if (!dueDate || status === 'DONE') return false;
+    return new Date(dueDate).getTime() < new Date().getTime();
+  }, [dueDate, status]);
 
-  const isTitleInvalid = form.title.trim().length === 0;
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (isTitleInvalid || hasPastDueDateError) return;
+    const cleanTitle = title.trim();
+    if (!cleanTitle) return;
+    if (hasPastDueDateError) return;
 
-    const payload: TaskCreateOrUpdate = {
-      title: form.title.trim(),
-      description: form.description.trim() || null,
-      status: form.status,
-      dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : null,
-    };
+    onSubmit({
+      title: cleanTitle,
+      description: description.trim() ? description : null,
+      status,
+      dueDate: dueDate ? new Date(dueDate).toISOString() : null,
+    });
 
-    onSubmitTask(payload);
+    if (!initialTask) {
+      setTitle('');
+      setDescription('');
+      setStatus('TODO');
+      setDueDate('');
+    }
   }
 
   return (
     <form onSubmit={handleSubmit} className="task-form">
       <div>
-        <label>Title</label>
+        <label htmlFor="title">Title</label>
         <input
-          value={form.title}
-          onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
+          id="title"
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter task title"
         />
-        {isTitleInvalid && <div className="error">Title is required</div>}
+        {!title.trim() && <div className="error">Title is required</div>}
       </div>
 
       <div>
-        <label>Description</label>
+        <label htmlFor="description">Description</label>
         <textarea
-          value={form.description}
-          onChange={(event) =>
-            setForm((current) => ({ ...current, description: event.target.value }))
-          }
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
         />
       </div>
 
       <div>
-        <label>Status</label>
+        <label htmlFor="status">Status</label>
         <select
-          value={form.status}
-          onChange={(event) =>
-            setForm((current) => ({ ...current, status: event.target.value as TaskStatus }))
-          }
+          id="status"
+          value={status}
+          onChange={(e) => setStatus(e.target.value as TaskStatus)}
         >
-          {statuses.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
+          <option value="TODO">TODO</option>
+          <option value="IN_PROGRESS">IN_PROGRESS</option>
+          <option value="DONE">DONE</option>
         </select>
       </div>
 
       <div>
-        <label>Due date &amp; time</label>
+        <label htmlFor="dueDate">Due date &amp; time</label>
         <input
+          id="dueDate"
           type="datetime-local"
-          value={form.dueDate}
-          onChange={(event) => setForm((current) => ({ ...current, dueDate: event.target.value }))}
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
         />
         {hasPastDueDateError && (
-          <div className="error">Past due date/time is only allowed for completed tasks.</div>
+          <div className="error">
+            Past due date/time is only allowed for completed tasks.
+          </div>
         )}
       </div>
 
       <div className="buttons">
-        <button type="submit" disabled={isTitleInvalid || hasPastDueDateError}>
+        <button type="submit" disabled={!title.trim() || hasPastDueDateError}>
           Save
         </button>
-        <button type="button" onClick={onCancelEdit}>
+        <button type="button" onClick={onCancel}>
           Cancel
         </button>
       </div>

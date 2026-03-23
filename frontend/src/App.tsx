@@ -67,13 +67,11 @@ export default function App() {
 
       <main className="layout">
         <div className="layout-column">
-          <TaskForm
-            initialTask={editingTask}
-            onSubmitTask={(payload) => {
-              void handleCreateOrUpdate(payload);
-            }}
-            onCancelEdit={() => setEditingTask(null)}
-          />
+         <TaskForm
+           initialTask={editingTask}
+           onSubmit={handleCreateOrUpdate}
+           onCancel={() => setEditingTask(null)}
+         />
 
           {error && <div className="alert alert-error">{error}</div>}
         </div>
