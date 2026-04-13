@@ -1,3 +1,4 @@
+import './TaskList.css';
 import type { Task } from '../models/task';
 
 interface TaskListProps {

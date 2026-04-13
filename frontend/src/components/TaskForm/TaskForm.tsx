@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import './TaskForm.css';
 import type { Task, TaskCreateOrUpdate, TaskStatus } from '../models/task';
 
 type Props = {
@@ -27,6 +28,8 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: Props) {
     }
   }, [initialTask]);
 
+  const hasTitleError = useMemo(() => !title.trim(), [title]);
+
   const hasPastDueDateError = useMemo(() => {
     if (!dueDate || status === 'DONE') return false;
     return new Date(dueDate).getTime() < new Date().getTime();
@@ -36,12 +39,11 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: Props) {
     e.preventDefault();
 
     const cleanTitle = title.trim();
-    if (!cleanTitle) return;
-    if (hasPastDueDateError) return;
+    if (!cleanTitle || hasPastDueDateError) return;
 
     onSubmit({
       title: cleanTitle,
-      description: description.trim() ? description : null,
+      description: description.trim() ? description.trim() : null,
       status,
       dueDate: dueDate ? new Date(dueDate).toISOString() : null,
     });
@@ -65,7 +67,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: Props) {
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter task title"
         />
-        {!title.trim() && <div className="error">Title is required</div>}
+        {hasTitleError && <div className="error">Title is required</div>}
       </div>
 
       <div>
@@ -106,7 +108,7 @@ export default function TaskForm({ initialTask, onSubmit, onCancel }: Props) {
       </div>
 
       <div className="buttons">
-        <button type="submit" disabled={!title.trim() || hasPastDueDateError}>
+        <button type="submit" disabled={hasTitleError || hasPastDueDateError}>
           Save
         </button>
         <button type="button" onClick={onCancel}>

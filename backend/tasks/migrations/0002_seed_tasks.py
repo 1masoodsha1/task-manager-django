@@ -35,13 +35,7 @@ def seed_tasks(apps, schema_editor):
             description="Check the online account and make the payment.",
             status="TODO",
             due_date=now + timedelta(days=3),
-        ),
-        Task(
-            title="Call mom",
-            description="Ask how she is doing and check in.",
-            status="DONE",
-            due_date=now - timedelta(hours=3),
-        ),
+        )
     ])
 
 

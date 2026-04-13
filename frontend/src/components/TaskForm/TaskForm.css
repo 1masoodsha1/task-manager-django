@@ -1,0 +1,39 @@
+.task-form {
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.task-form > div {
+  margin-bottom: 12px;
+}
+
+.task-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.task-form input,
+.task-form textarea,
+.task-form select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.task-form textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.error {
+  color: #c00;
+  padding: 8px 0;
+}

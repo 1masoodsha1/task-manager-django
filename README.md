@@ -19,7 +19,7 @@ Above all, relax and have fun with it. Treat this as a chance to show how you na
 This project contains two separate applications:
 
 - **Backend** —  Django Web API (6.0.3)
-- **Frontend** — React (19.2.4) 
+- **Frontend** — React + TypeScript + Vite
 
 You must run **both** for the application to work.
 
@@ -29,10 +29,12 @@ You must run **both** for the application to work.
 
 ### **Requirements**
 BE
+- Python 3.12+
 - Port **8000** must be available
 
 FE
-- NPM (or Yarn)
+- Node.js 18+
+- NPM
 - Port 5173 must be available 
 
 ### **Steps**
@@ -44,12 +46,23 @@ BE
    cd backend
    ```
 2. Start the Django application:
-
    ```bash
-   .venv\Scripts\activate
-   py -m pip install -r requirements.txt
-   py manage.py migrate
-   py manage.py runserver 8000
+   python -m venv .venv
+   ```
+
+   Windows 
+   ```bash
+   .\.venv\Scripts\Activate.ps1
+   python -m pip install -r requirements.txt
+   python manage.py migrate
+   python manage.py runserver 8000
+   ```
+   Mac/Linux
+   ```bash
+   source .venv/bin/activate
+   python -m pip install -r requirements.txt
+   python manage.py migrate
+   python manage.py runserver 8000
    ```
 FE
 1. Navigate to the frontend directory:
@@ -66,14 +79,32 @@ FE
    ```
 ---
 
+## Run Tests 
+
+The backend exposes a simple REST API for managing tasks under the base path:
+
+BE
+```bash
+cd backend
+python manage.py test
+```
+FE
+```
+cd frontend
+npm install
+npm test
+```
+
+
+
 ## Current API Overview
 
 The backend exposes a simple REST API for managing tasks under the base path:
 
 ```text
-GET    /api/tasks            → list all tasks
-GET    /api/tasks/<pk>/      → Get one task 
-POST   /api/tasks            → create a new task, returns created resource (201)
-PUT    /api/tasks/<pk>/      → update an existing task
-DELETE /api/tasks/<pk>/      → delete a task 
+GET     /api/tasks/         List all tasks
+POST    /api/tasks/         Create a task
+GET     /api/tasks/<id>/    Get one task
+PUT     /api/tasks/<id>/    Update a task
+DELETE  /api/tasks/<id>/    Delete a task
 ```

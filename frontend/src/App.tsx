@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import './index.css';
-import TaskForm from './components/TaskForm';
-import TaskList from './components/TaskList';
+import './App.css';
+import TaskForm from './components/TaskForm/TaskForm';
+import TaskList from './components/TaskList/TaskList';
 import type { Task, TaskCreateOrUpdate } from './models/task';
 import { taskService } from './services/taskService';
 
@@ -67,13 +67,13 @@ export default function App() {
 
       <main className="layout">
         <div className="layout-column">
-         <TaskForm
-           initialTask={editingTask}
-           onSubmit={handleCreateOrUpdate}
-           onCancel={() => setEditingTask(null)}
-         />
+          <TaskForm
+            initialTask={editingTask}
+            onSubmit={handleCreateOrUpdate}
+            onCancel={() => setEditingTask(null)}
+          />
 
-          {error && <div className="alert alert-error">{error}</div>}
+          {error && <div className="alert-error">{error}</div>}
         </div>
 
         <div className="layout-column">
